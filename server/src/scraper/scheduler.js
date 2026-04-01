@@ -52,8 +52,25 @@ export async function runScrapeJob() {
 }
 
 export function startScheduler() {
-  cron.schedule("0 6 * * *", () => runScrapeJob());
-  cron.schedule("0 10 * * *", () => runScrapeJob());
-  cron.schedule("0 16 * * *", () => runScrapeJob());
+  // 09:00, 13:00, 19:00 Turkey time (UTC+3)
+  cron.schedule("0 6 * * *", () => runWithRetry());
+  cron.schedule("0 10 * * *", () => runWithRetry());
+  cron.schedule("0 16 * * *", () => runWithRetry());
   console.log("[Scheduler] Cron jobs scheduled: 09:00, 13:00, 19:00 (TR)");
+}
+
+async function runWithRetry(maxRetries = 2) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const results = await runScrapeJob();
+      if (results.sahibinden + results.arabam > 0 || results.errors.length === 0) return;
+      console.log(`[Scheduler] Attempt ${attempt} got 0 results, retrying in 5 min...`);
+      await new Promise((r) => setTimeout(r, 5 * 60 * 1000));
+    } catch (err) {
+      console.error(`[Scheduler] Attempt ${attempt} failed:`, err.message);
+      if (attempt < maxRetries) {
+        await new Promise((r) => setTimeout(r, 5 * 60 * 1000));
+      }
+    }
+  }
 }

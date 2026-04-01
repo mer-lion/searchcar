@@ -7,6 +7,8 @@ import "dotenv/config";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { startScheduler } from "./scraper/scheduler.js";
 import { initBot } from "./telegram/bot.js";
+import { startKeepAlive } from "./keep-alive.js";
+import { startCleanup } from "./scraper/cleanup.js";
 import listingsRouter from "./routes/listings.js";
 import analysisRouter from "./routes/analysis.js";
 import watchlistRouter from "./routes/watchlist.js";
@@ -39,7 +41,9 @@ app.use((req, res) => {
 });
 
 startScheduler();
+startCleanup();
 initBot();
+startKeepAlive();
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
