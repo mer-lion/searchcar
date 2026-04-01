@@ -14,11 +14,11 @@ export default function ScoreCard({ listing, analysis }) {
   return (
     <div className={`rounded-xl border ${style.border} ${style.bg} p-4`}>
       <div className="flex items-center justify-between mb-2">
-        <span className={`font-bold text-lg ${style.text}`}>{analysis.decision}</span>
-        <span className="text-sm text-gray-600">Güven: {analysis.confidence_score}/100</span>
+        <span className={`font-bold text-base md:text-lg ${style.text}`}>{analysis.decision}</span>
+        <span className="text-xs md:text-sm text-gray-600">Güven: {analysis.confidence_score}/100</span>
       </div>
-      <h3 className="font-semibold text-gray-900 mb-1">{listing.title}</h3>
-      <div className="text-sm text-gray-600 space-y-1">
+      <h3 className="font-semibold text-gray-900 mb-1 text-sm md:text-base line-clamp-2">{listing.title}</h3>
+      <div className="text-xs md:text-sm text-gray-600 space-y-1">
         <p>{listing.location_city}{listing.location_district ? ` / ${listing.location_district}` : ""}</p>
         <p>Fiyat: {formatNumber(listing.price)} TL</p>
         <p>Piyasa: {formatNumber(analysis.market_value)} TL</p>

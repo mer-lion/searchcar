@@ -7,9 +7,9 @@ export default function StatsWidget({ label, value, color = "blue" }) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <p className="text-sm text-gray-500 mb-1">{label}</p>
-      <p className={`text-3xl font-bold ${colorMap[color]?.split(" ")[1] || "text-gray-900"}`}>
+    <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
+      <p className="text-xs md:text-sm text-gray-500 mb-1 leading-tight">{label}</p>
+      <p className={`text-2xl md:text-3xl font-bold ${colorMap[color]?.split(" ")[1] || "text-gray-900"}`}>
         {value}
       </p>
     </div>
