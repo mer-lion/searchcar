@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npm test:*)",
+      "Bash(npx vitest:*)",
+      "Bash(git -c user.name=Ayhan -c user.email=ayhan@merlions.com.tr add server/src/analysis/profit-calculator.js server/tests/analysis/profit-calculator.test.js)",
+      "Bash(git -c user.name=Ayhan -c user.email=ayhan@merlions.com.tr commit -m \"feat: add profit calculator with weighted scoring and decision logic\")",
+      "Bash(rm /d/inetpub/wwwroot/ilantarama/.git/index.lock)",
+      "Bash(git -C /d/inetpub/wwwroot/ilantarama add server/src/analysis/price-analyzer.js server/tests/analysis/price-analyzer.test.js)",
+      "Bash(git -C /d/inetpub/wwwroot/ilantarama commit -m \"feat: add price analyzer with median, mileage, and location adjustments\")",
+      "Bash(git -C /d/inetpub/wwwroot/ilantarama status)",
+      "Bash(git -C /d/inetpub/wwwroot/ilantarama ls-files --others --exclude-standard server/src/analysis/ server/tests/analysis/)",
+      "Bash(git -C /d/inetpub/wwwroot/ilantarama log --oneline -5)",
+      "Bash(git -C /d/inetpub/wwwroot/ilantarama show --stat HEAD)",
+      "Bash(git -C /d/inetpub/wwwroot/ilantarama log --oneline --all)",
+      "Bash(git -C /d/inetpub/wwwroot/ilantarama show --stat HEAD~2)",
+      "Bash(git:*)",
+      "Bash(node -e ':*)",
+      "Bash(node src/index.js)",
+      "Bash(curl -s http://localhost:3001/api/health)",
+      "Bash(curl -s http://localhost:3001/api/users)",
+      "Bash(curl -s http://localhost:3001/api/scraper/status)",
+      "Bash(node -e \"process.stdin.on\\('data',d=>console.log\\(JSON.stringify\\(JSON.parse\\(d\\),null,2\\)\\)\\)\")",
+      "Bash(pkill -f \"node src/index.js\")",
+      "Bash(curl -s -X POST http://localhost:3001/api/scraper/trigger)",
+      "Bash(pkill -f \"node\")"
+    ]
+  }
+}

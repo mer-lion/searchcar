@@ -1,10 +1,9 @@
 FROM node:20-slim
 
-# Puppeteer dependencies
+# Puppeteer/Chromium dependencies
 RUN apt-get update && apt-get install -y \
     chromium \
     fonts-liberation \
-    libappindicator3-1 \
     libasound2 \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
@@ -26,9 +25,18 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --omit=dev
-COPY src/ ./src/
+
+# Build client
+COPY client/package*.json ./client/
+RUN cd client && npm ci
+COPY client/ ./client/
+RUN cd client && npm run build
+
+# Install server
+COPY server/package*.json ./server/
+RUN cd server && npm ci --omit=dev
+COPY server/src/ ./server/src/
 
 EXPOSE 3001
+WORKDIR /app/server
 CMD ["node", "src/index.js"]
