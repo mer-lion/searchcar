@@ -16,7 +16,18 @@ function parseKm(kmStr) {
   return parseInt(kmStr.replace(/\./g, ""), 10) || 0;
 }
 
-export function parseArabamDetailPage(html, url) {
+/**
+ * Parses arabam.com detail page using page.evaluate() result.
+ * Can also parse from raw HTML for tests.
+ */
+export function parseArabamDetailPage(htmlOrData, url) {
+  // If called with structured data from page.evaluate
+  if (typeof htmlOrData === "object" && htmlOrData.properties) {
+    return buildListingFromProperties(htmlOrData, url);
+  }
+
+  // Fallback: parse from raw HTML (for tests)
+  const html = htmlOrData;
   const getDataKey = (key) => {
     const regex = new RegExp(`data-key="${key}">([^<]+)</span>`);
     const match = html.match(regex);
@@ -25,7 +36,6 @@ export function parseArabamDetailPage(html, url) {
 
   const priceMatch = html.match(/listing-price[^>]*>([\d.]+\s*TL)/);
   const titleMatch = html.match(/listing-title[^>]*>([^<]+)/);
-
   const sellerRaw = getDataKey("seller");
 
   return {
@@ -45,6 +55,38 @@ export function parseArabamDetailPage(html, url) {
     location_district: getDataKey("town"),
     seller_type: sellerRaw === "Galeriden" ? "galeri" : "sahibinden",
     damage_record: getDataKey("damage"),
+  };
+}
+
+/**
+ * Builds listing from structured property data extracted via page.evaluate().
+ * This matches arabam.com's real DOM structure with .property-key / .property-value pairs.
+ */
+function buildListingFromProperties(data, url) {
+  const props = data.properties || {};
+  const externalId = url.match(/\/(\d+)(?:\?|$)/)?.[1] || url.split("/").pop() || "";
+
+  // Parse title for location: "Galeriden Kia Rio ... 2020 Model Isparta 145.000 km Gri"
+  const titleParts = (data.title || "").match(/Model\s+([^\d]+)\s+[\d.]+/);
+  const locationCity = titleParts ? titleParts[1].trim() : null;
+
+  return {
+    external_id: externalId,
+    source: "arabam",
+    url,
+    title: data.title || "",
+    brand: props["Marka"] || null,
+    model: props["Seri"] || null,
+    year: parseInt(props["Yıl"], 10) || 0,
+    fuel_type: props["Yakıt Tipi"] || null,
+    transmission: props["Vites Tipi"] || null,
+    mileage: parseKm(props["Kilometre"]),
+    color: props["Renk"] || null,
+    price: parsePrice(data.price || ""),
+    location_city: locationCity,
+    location_district: null,
+    seller_type: props["Kimden"] === "Galeriden" ? "galeri" : "sahibinden",
+    damage_record: props["Boya-değişen"] || "Belirtilmemiş",
   };
 }
 
@@ -110,10 +152,11 @@ export async function scrapeArabam(searchUrl, maxPages = 3) {
 
       const links = await page.$$eval(
         'a[href*="/ilan/"]',
-        (els) => els.map((el) => el.href).filter((h) => h.includes("/ilan/"))
+        (els) => els.map((el) => el.href).filter((h) => /\/ilan\/.*\/\d+$/.test(h))
       );
 
-      const uniqueLinks = [...new Set(links)];
+      const uniqueLinks = [...new Set(links)].slice(0, 20); // Max 20 per page
+      console.log(`[Arabam] Found ${uniqueLinks.length} listing links on page ${p + 1}`);
       if (uniqueLinks.length === 0) break;
 
       for (const link of uniqueLinks) {
@@ -123,9 +166,35 @@ export async function scrapeArabam(searchUrl, maxPages = 3) {
           await simulateHuman(page);
           await randomDelay(5000, 12000);
 
-          const html = await page.content();
-          const listing = parseArabamDetailPage(html, link);
-          if (listing.price > 0) listings.push(listing);
+          // Extract structured data via page.evaluate (more reliable than HTML parsing)
+          const pageData = await page.evaluate(() => {
+            const title = document.querySelector("h1")?.textContent?.trim() || "";
+            const price = document.querySelector(".product-price")?.textContent?.trim() || "";
+
+            // Build property map from first occurrence of each key
+            const keys = Array.from(document.querySelectorAll(".property-key")).map((e) => e.textContent.trim());
+            const vals = Array.from(document.querySelectorAll(".property-value")).map((e) => e.textContent.trim());
+
+            const properties = {};
+            const seen = new Set();
+            // Keys have 1 offset because "Fiyat" key has no matching value in the value list
+            for (let i = 0; i < keys.length && i < vals.length; i++) {
+              const key = keys[i + 1]; // skip "Fiyat" key
+              const val = vals[i];
+              if (key && !seen.has(key)) {
+                properties[key] = val;
+                seen.add(key);
+              }
+            }
+
+            return { title, price, properties };
+          });
+
+          const listing = parseArabamDetailPage(pageData, link);
+          if (listing.price > 0) {
+            listings.push(listing);
+            console.log(`[Arabam] Parsed: ${listing.brand} ${listing.model} - ${listing.price} TL`);
+          }
         } catch (err) {
           console.error(`Error scraping arabam listing:`, err.message);
         }
@@ -138,7 +207,4 @@ export async function scrapeArabam(searchUrl, maxPages = 3) {
   return listings;
 }
 
-export async function saveListings(listings) {
-  // Placeholder — will be replaced when sahibinden-scraper.js is available
-  return listings;
-}
+export { saveListings } from "./sahibinden-scraper.js";
