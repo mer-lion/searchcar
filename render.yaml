@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: ilantarama
+    runtime: node
+    buildCommand: chmod +x render-build.sh && ./render-build.sh
+    startCommand: cd server && node src/index.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: PORT
+        value: 3001

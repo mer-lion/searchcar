@@ -121,10 +121,14 @@ export async function scrapeArabam(searchUrl, maxPages = 3) {
       "--disable-setuid-sandbox",
       "--disable-blink-features=AutomationControlled",
       "--disable-infobars",
+      "--disable-dev-shm-usage",
       "--window-size=1920,1080",
       ...(proxy ? [`--proxy-server=${proxy}`] : []),
     ],
     ignoreDefaultArgs: ["--enable-automation"],
+    ...(process.env.PUPPETEER_EXECUTABLE_PATH && {
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+    }),
   };
 
   const browser = await puppeteer.launch(launchOptions);

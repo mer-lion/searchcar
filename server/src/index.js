@@ -1,6 +1,10 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 import "dotenv/config";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { startScheduler } from "./scraper/scheduler.js";
 import { initBot } from "./telegram/bot.js";
 import listingsRouter from "./routes/listings.js";
@@ -25,6 +29,13 @@ app.use("/api/ai", aiRouter);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// Serve frontend static files in production
+const clientDist = path.join(__dirname, "../../client/dist");
+app.use(express.static(clientDist));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientDist, "index.html"));
 });
 
 startScheduler();
