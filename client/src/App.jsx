@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
+import Dashboard from "./pages/Dashboard";
 
 function Placeholder({ title }) {
   return <div className="p-8 text-2xl font-bold text-gray-800">{title}</div>;
@@ -10,7 +11,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route path="/" element={<Placeholder title="Dashboard" />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/listings" element={<Placeholder title="İlanlar" />} />
           <Route path="/listings/:id" element={<Placeholder title="İlan Detayı" />} />
           <Route path="/trends" element={<Placeholder title="Trendler" />} />
