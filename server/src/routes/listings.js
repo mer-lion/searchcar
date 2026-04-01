@@ -47,10 +47,17 @@ router.get("/", async (req, res) => {
 
   if (error) return res.status(500).json({ error: error.message });
 
-  let filtered = data;
+  // Normalize analysis_results: Supabase may return object or array depending on constraint
+  const normalized = (data || []).map((row) => {
+    const ar = row.analysis_results;
+    row.analysis_results = Array.isArray(ar) ? ar : ar ? [ar] : [];
+    return row;
+  });
+
+  let filtered = normalized;
   if (queryPlan.joinAnalysis && queryPlan.analysisFilter) {
-    filtered = data.filter((row) =>
-      row.analysis_results?.some((a) => a.decision === queryPlan.analysisFilter.decision)
+    filtered = normalized.filter((row) =>
+      row.analysis_results.some((a) => a.decision === queryPlan.analysisFilter.decision)
     );
   }
 
