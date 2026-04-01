@@ -34,7 +34,7 @@ app.get("/api/health", (req, res) => {
 // Serve frontend static files in production
 const clientDist = path.join(__dirname, "../../client/dist");
 app.use(express.static(clientDist));
-app.get("*", (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(clientDist, "index.html"));
 });
 
