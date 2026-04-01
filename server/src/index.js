@@ -9,6 +9,7 @@ import watchlistRouter from "./routes/watchlist.js";
 import trendsRouter from "./routes/trends.js";
 import scraperRouter from "./routes/scraper.js";
 import usersRouter from "./routes/users.js";
+import aiRouter from "./routes/ai.js";
 
 const app = express();
 app.use(cors());
@@ -20,6 +21,7 @@ app.use("/api/watchlist", watchlistRouter);
 app.use("/api/trends", trendsRouter);
 app.use("/api/scraper", scraperRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/ai", aiRouter);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });

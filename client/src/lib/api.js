@@ -36,3 +36,9 @@ export const usersApi = {
   create: (data) => api.post("/users", data).then((r) => r.data),
   remove: (id) => api.delete(`/users/${id}`).then((r) => r.data),
 };
+
+export const aiApi = {
+  analyze: (id) => api.post(`/ai/analyze/${id}`).then((r) => r.data),
+  suspicious: (id) => api.post(`/ai/suspicious/${id}`).then((r) => r.data),
+  search: (query) => api.post("/ai/search", { query }).then((r) => r.data),
+};
