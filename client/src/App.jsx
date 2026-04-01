@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
-
-function Placeholder({ title }) {
-  return <div className="p-8 text-2xl font-bold text-gray-800">{title}</div>;
-}
+import Listings from "./pages/Listings";
+import ListingDetail from "./pages/ListingDetail";
+import Trends from "./pages/Trends";
+import Watchlist from "./pages/Watchlist";
+import Settings from "./pages/Settings";
 
 export default function App() {
   return (
@@ -12,11 +13,11 @@ export default function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/listings" element={<Placeholder title="İlanlar" />} />
-          <Route path="/listings/:id" element={<Placeholder title="İlan Detayı" />} />
-          <Route path="/trends" element={<Placeholder title="Trendler" />} />
-          <Route path="/watchlist" element={<Placeholder title="Takip Listesi" />} />
-          <Route path="/settings" element={<Placeholder title="Ayarlar" />} />
+          <Route path="/listings" element={<Listings />} />
+          <Route path="/listings/:id" element={<ListingDetail />} />
+          <Route path="/trends" element={<Trends />} />
+          <Route path="/watchlist" element={<Watchlist />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>
